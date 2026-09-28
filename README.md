@@ -1,107 +1,129 @@
-# Git & GitHub Lab
+# Git & GitHub Hands-on Lab
 
-Work in pairs: one computer, one team file, one pull request. You will save changes, undo a commit, and send your finished file to the AI Club repository.
+A beginner-friendly exercise by the AI Club at G.H. Raisoni University, Saikheda.
 
-Use **Git Bash** for the commands. Keep the same window open throughout the lab.
+---
+
+### instructions & Setup
+* Student will work in **pairs** on **one computer**.
+* Both students need a **GitHub account**.
+* Open **Git Bash** on your computer and keep the same terminal window open throughout the session.
 
 ## A few words before you start
 
-- **Repository (repo):** a project folder with its Git history.
-- **Fork:** your own copy of an online repo.
-- **Clone:** download your fork to this computer.
-- **Branch:** a separate line of work, so you can edit without changing `main`.
-- **Commit:** a saved version of your work.
-- **Pull request (PR):** ask the repo owner to review and merge your branch.
-
 Both students need GitHub accounts. One student will own the pair's fork; take turns at the keyboard. Your team file will be public, including the names and academic details you enter.
+
+**Some Key Concepts**
+* **Fork:** Copying the main project repository into your personal GitHub account.
+* **Clone:** Downloading your copy (fork) from GitHub to your local computer.
+* **Branch:** Creating a separate workspace so your main code remains safe.
+* **Commit:** Saving a checkpoint of your local changes.
+* **Push:** Uploading your local commits to your GitHub account.
+* **Pull Request (PR):** Requesting the original repository owner to merge your work.
+
+---
 
 ## 1. Star, fork, and clone
 
-Open [KEYUR141/Git-Github-Lab](https://github.com/KEYUR141/Git-Github-Lab). Click **Star** to save the repo on GitHub, then **Fork** to make your own copy.
-
-Replace the two values below:
-
-- `your-github-username`: the GitHub account that owns the fork.
-- `your-team-name-pc-number`: a unique lowercase name with your computer number, such as `byte-builders-pc12`. Use only letters, numbers, and hyphens.
+1. Go to the original repository: **[KEYUR141/Git-Github-Lab](https://github.com/KEYUR141/Git-Github-Lab)**
+2. Click **Star** (top right), then click **Fork** to create a copy under Student 1's account.
+3. Open **Git Bash** and run the following commands (replace `your-github-username` with your actual username):
 
 ```bash
+# Replace 'your-github-username' with Student 1's account name
 GITHUB_USERNAME="your-github-username"
+
+# Choose a team slug (lowercase, hyphens only, with PC number, e.g., byte-builders-pc12)
 TEAM_SLUG="your-team-name-pc-number"
-git clone "https://github.com/${GITHUB_USERNAME}/Git-Github-Lab.git"
+
+# Clone your fork to the local machine
+git clone "[https://github.com/$](https://github.com/$){GITHUB_USERNAME}/Git-Github-Lab.git"
 cd Git-Github-Lab
-git remote -v
 ```
 
-`origin` in the last command should show **your fork**. Set the name and GitHub-linked email that will appear on your commits:
-
+1. Configure your Git identity (Use Student 1's GitHub credentials)
 ```bash
-git config --local user.name "YOUR_FULL_NAME"
-git config --local user.email "YOUR_GITHUB_EMAIL"
+git config --local user.name "Your Full Name"
+git config --local user.email "your-github-email@example.com"
 ```
 
-Replace both uppercase values. A GitHub no-reply email also works.
+**Sanity Check**: Run git remote -v. Ensure the output links to your personal GitHub username, not KEYUR141.
 
-## 2. Create your branch
 
-`pull` downloads and applies the latest changes. `switch -c` creates your team's branch and moves you onto it.
+## 2. Create a Working Branch
+
+Always keep your work off the main branch. Bring your local code up to date and create a new branch:
 
 ```bash
 git switch main
 git pull --ff-only origin main
 git switch -c "team/${TEAM_SLUG}"
-git branch --show-current
 ```
 
-The last line should show `team/your-chosen-slug`. Do the next tasks on this branch.
+**Another Sanity Check**: Run git branch --show-current. It should output team/your-team-name-pc-number.
 
-## Task 1: Create and commit a file
+## Task 1 : Create and Commit Your Team File
 
-In the `teams` folder, create `YOUR_TEAM_SLUG.md`. Use your actual slug for the filename. Put only this heading inside it, replacing `YOUR_TEAM_NAME` with your readable team name:
+Create a new file inside the existing teams/ directory named YOUR_TEAM_SLUG.md (e.g., teams/byte-builders-pc12.md).
+
+1. Open your code editor (VS Code or Notepad) and put only a single header at the top of teams/YOUR_TEAM_SLUG.md:
 
 ```md
 # Team: YOUR_TEAM_NAME
 ```
 
-`status` shows the new file. `add` stages it, and `commit` saves this first version.
+1. Save the file, then stage and commit it using Git Bash:
 
 ```bash
 git status
 git add "teams/${TEAM_SLUG}.md"
 git diff --staged
 git commit -m "lab: create team file"
+git log --oneline -1
 ```
 
-## Task 2: Add both names
+## Task 2: Add Student Names
 
-Add these lines below the heading, replacing the names:
+1. Open teams/YOUR_TEAM_SLUG.md again and add both student names below the header:
 
 ```md
+# Team: YOUR_TEAM_NAME
+
 Student 1 name: STUDENT_1_FULL_NAME
 Student 2 name: STUDENT_2_FULL_NAME
 ```
 
-`diff` shows what changed since the last commit. Save the names as a second commit:
+1. Save the file, review your changes, and make a second commit:
 
 ```bash
 git diff
 git add "teams/${TEAM_SLUG}.md"
 git commit -m "lab: add names"
+git log --oneline -2
 ```
 
-## Task 3: Revert that commit
+## Task 3: Revert the Names Commit
 
-`revert` makes a new commit that undoes the previous one. It keeps both commits in the history.
+Now you will undo the second commit without wiping out your history using git revert.
+
+Run the revert command:
 
 ```bash
 git revert HEAD --no-edit
+```
+**Troubleshooting** (If a text editor opens (do not panic)):
+If Git Bash opens a text editor (like Vim) displaying a message, type :wq and press Enter to save and exit.
+
+Verify the revert:
+
+```bash
 git log --oneline -3
 ```
+Open teams/YOUR_TEAM_SLUG.md in your editor. It should now be back to showing only the original # Team: YOUR_TEAM_NAME heading.
 
-Open the file again. It should contain only the team heading.
+## Task 4: Add Final Details
 
-## Task 4: Add the final details
-
-Now add both students' details. Replace **every** uppercase value:
+1. Open teams/YOUR_TEAM_SLUG.md and add complete academic details for both team members:
 
 ```md
 # Team: YOUR_TEAM_NAME
@@ -117,41 +139,72 @@ Student 2 year: STUDENT_2_YEAR
 Student 2 semester: STUDENT_2_SEMESTER
 ```
 
-Review and save the final version:
+1. Save the file, stage, and commit:
 
 ```bash
 git diff
 git add "teams/${TEAM_SLUG}.md"
 git commit -m "lab: add final details"
+```
+1. Confirm your 4 commits:
+
+```bash
 git log --oneline -4
-git status
 ```
 
-You should see four commits: create file, add names, revert names, add final details.
+You should see exactly four commit messages: create file, add names, revert commit, and add final details.
 
-## Task 5: Push and open a PR
+## Task 5 : Push Changes and open a pull request
 
-`push` uploads your branch to your fork on GitHub:
+1. Push your local branch up to your GitHub fork:
 
 ```bash
 git push -u origin "team/${TEAM_SLUG}"
 ```
 
-On your fork's GitHub page, click **Contribute → Open pull request**. Check the direction:
+1. Go to your fork's page on GitHub in your web browser.
 
-- **Into:** `KEYUR141/Git-Github-Lab`, branch `main`
-- **From:** your fork, branch `team/YOUR_TEAM_SLUG`
+2. Click Contribute → Open pull request (or the green Compare & pull request button).
 
-Submit the PR. The checker will look for your file, four commits, revert, and final details. Ask the instructor if a check needs approval or shows an error. The AI Club team will review and merge the PR.
+3. Verify the PR settings:
 
-## If you finish early
+    i. Base repository: KEYUR141/Git-Github-Lab | Branch: main
 
-`upstream` is a name for the original repo. `fetch` downloads its latest commits; `merge` brings them into your current branch.
+    ii. Head repository: your-username/Git-Github-Lab | Branch: team/YOUR_TEAM_SLUG
+
+4. Set the PR Title: Add YOUR_TEAM_NAME (PC YOUR_PC_NUMBER)
+
+5. Click Create Pull Request.
+
+## Optional: Sync Upstream Changes (If you were fast )
+
+If other teams' PRs get merged into the main repository while you are working, sync your fork with the original repository:
 
 ```bash
-git remote add upstream https://github.com/KEYUR141/Git-Github-Lab.git
+# Add the original repo as an upstream remote
+git remote add upstream [https://github.com/KEYUR141/Git-Github-Lab.git](https://github.com/KEYUR141/Git-Github-Lab.git)
+
+# Fetch upstream commits and merge them
 git fetch upstream
 git merge upstream/main
 ```
+## Command reminder
 
-`Already up to date` means there is nothing new to merge. After the instructor has merged PRs, `git switch main` followed by `git pull upstream main` updates your local `main`.
+| Command | What you used it for |
+| --- | --- |
+| `git clone` | Download your fork to the lab computer |
+| `git config --local` | Set the identity recorded on commits in this repository |
+| `git remote -v` | See where fetches and pushes go |
+| `git switch -c` | Create and enter your working branch |
+| `git status` | Check changed, staged, or untracked files |
+| `git diff` / `git diff --staged` | Review changes before and after staging |
+| `git add` | Stage a file for the next commit |
+| `git commit` | Save a project version |
+| `git log --oneline` | Read the commit history |
+| `git revert` | Undo a committed change with a new commit |
+| `git push` | Send your branch to your fork on GitHub |
+| `git fetch` | Download changes without merging them |
+| `git merge` | Bring fetched upstream changes into your branch |
+| `git pull` | Fetch and merge in one command |
+
+`git init` starts a brand-new local repository. This exercise uses `git clone` because the shared practice repository already exists.
