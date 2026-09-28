@@ -1,0 +1,31 @@
+name: Check lab tasks
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      # Run the checker from the original repository, not code supplied by a fork.
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Fetch pull request commits
+        run: git fetch --no-tags origin "pull/${{ github.event.number }}/head:refs/remotes/origin/lab-pr"
+
+      - name: Check team tasks
+        env:
+          LAB_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          LAB_HEAD_REF: refs/remotes/origin/lab-pr
+          LAB_HEAD_BRANCH: ${{ github.event.pull_request.head.ref }}
+          LAB_FROM_FORK: ${{ github.event.pull_request.head.repo.fork }}
+        run: node scripts/check-lab.mjs
