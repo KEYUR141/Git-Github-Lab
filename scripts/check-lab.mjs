@@ -22,10 +22,14 @@ function fileAt(commit, path) {
   }
 }
 
+function isPlaceholder(value) {
+  return /^(?:-|n\/a|todo|your(?:[_ -].*)?|student_[12]_.+|first student|second student)$/i.test(value);
+}
+
 function field(text, label) {
   const line = text?.split('\n').find((entry) => entry.split(':', 1)[0].trim().toLowerCase() === label.toLowerCase());
   const value = line?.slice(line.indexOf(':') + 1).trim();
-  return value && !/^(?:-|n\/a|todo|your .+|first student|second student)$/i.test(value) ? value : null;
+  return value && !isPlaceholder(value) ? value : null;
 }
 
 const results = [];
@@ -35,12 +39,13 @@ function check(label, passed, detail) {
 }
 
 check('Fork', fromFork === 'true', 'Open the PR from your own fork.');
-check('Working branch', /^team\/[a-z0-9][a-z0-9-]*$/.test(branch ?? ''), 'Use a branch like team/byte-builders-pc12.');
+const validBranch = /^team\/[a-z0-9][a-z0-9-]*$/.test(branch ?? '') && branch !== 'team/your-team-name-pc-number';
+check('Working branch', validBranch, 'Replace the example slug with your lowercase team name and computer number.');
 
 const changes = git('diff', '--name-status', base, head).split(/\r?\n/).filter(Boolean);
 const onlyFile = changes.length === 1 ? changes[0].split('\t') : [];
 const path = onlyFile[1];
-const validPath = onlyFile[0] === 'A' && /^teams\/[a-z0-9][a-z0-9-]*\.md$/.test(path ?? '') && path !== 'teams/README.md';
+const validPath = onlyFile[0] === 'A' && /^teams\/[a-z0-9][a-z0-9-]*\.md$/.test(path ?? '') && !['teams/README.md', 'teams/your-team-name-pc-number.md'].includes(path);
 check('One new team file', validPath, 'Add only teams/your-team-pc-number.md.');
 
 if (validPath) {
@@ -60,7 +65,8 @@ if (validPath) {
   if (ordered) {
     const [created, named, reverted, completed] = positions.map((position) => fileAt(commits[position], path));
     const final = fileAt(head, path);
-    const firstVersion = /^# Team: .+$/m.test(created ?? '') && created.split('\n').filter(Boolean).length === 1;
+    const teamName = created?.match(/^# Team:\s*(.+)$/m)?.[1]?.trim();
+    const firstVersion = Boolean(teamName && !isPlaceholder(teamName) && created.split('\n').filter(Boolean).length === 1);
     check('Task 1: file with team heading', firstVersion, 'Commit the heading by itself.');
     check('Task 2: both names', Boolean(field(named, 'Student 1 name') && field(named, 'Student 2 name')), 'Add both names in the second commit.');
     check('Task 3: revert restored first version', reverted === created, 'Revert the names commit before adding final details.');

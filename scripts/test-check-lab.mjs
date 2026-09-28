@@ -16,7 +16,7 @@ function writeTeam(text) {
   writeFileSync(join(directory, 'teams', 'byte-builders-pc12.md'), text);
 }
 
-function runCheck(base) {
+function runCheck(base, branch = 'team/byte-builders-pc12') {
   return spawnSync(process.execPath, [checker], {
     cwd: directory,
     encoding: 'utf8',
@@ -24,7 +24,7 @@ function runCheck(base) {
       ...process.env,
       LAB_BASE_SHA: base,
       LAB_HEAD_REF: 'HEAD',
-      LAB_HEAD_BRANCH: 'team/byte-builders-pc12',
+      LAB_HEAD_BRANCH: branch,
       LAB_FROM_FORK: 'true',
     },
   });
@@ -56,6 +56,9 @@ try {
 
   const passing = runCheck(base);
   assert.equal(passing.status, 0, passing.stdout + passing.stderr);
+
+  const unchangedPlaceholder = runCheck(base, 'team/your-team-name-pc-number');
+  assert.notEqual(unchangedPlaceholder.status, 0, unchangedPlaceholder.stdout + unchangedPlaceholder.stderr);
 
   writeTeam('# Team: Byte Builders\n\nStudent 1 name: Asha Rao\n');
   git('add', 'teams/byte-builders-pc12.md');

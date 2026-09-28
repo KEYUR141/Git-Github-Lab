@@ -1,8 +1,8 @@
 ## Team submission
 
-Team name:
-Computer number:
-Both students' GitHub usernames (optional):
+Team name: YOUR_TEAM_NAME
+Computer number: YOUR_PC_NUMBER
+Both students' GitHub usernames (optional): YOUR_GITHUB_USERNAMES
 
 ## Lab checklist
 
