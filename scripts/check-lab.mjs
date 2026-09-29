@@ -39,14 +39,14 @@ function check(label, passed, detail) {
 }
 
 check('Fork', fromFork === 'true', 'Open the PR from your own fork.');
-const validBranch = /^team\/[a-z0-9][a-z0-9-]*$/.test(branch ?? '') && branch !== 'team/your-team-name-pc-number';
-check('Working branch', validBranch, 'Replace the example slug with your lowercase team name and computer number.');
+const pcNumber = /^team\/pc([1-9][0-9]*)$/.exec(branch ?? '')?.[1];
+check('Working branch', Boolean(pcNumber), 'Use team/pc followed by your assigned PC number, for example team/pc12.');
 
 const changes = git('diff', '--name-status', base, head).split(/\r?\n/).filter(Boolean);
 const onlyFile = changes.length === 1 ? changes[0].split('\t') : [];
 const path = onlyFile[1];
-const validPath = onlyFile[0] === 'A' && /^teams\/[a-z0-9][a-z0-9-]*\.md$/.test(path ?? '') && !['teams/README.md', 'teams/your-team-name-pc-number.md'].includes(path);
-check('One new team file', validPath, 'Add only teams/your-team-pc-number.md.');
+const validPath = onlyFile[0] === 'A' && Boolean(pcNumber) && path === `teams/pc${pcNumber}.md`;
+check('One new team file', validPath, 'Add only teams/pcYOUR_PC_NUMBER.md, matching your branch.');
 
 if (validPath) {
   const commits = git('rev-list', '--reverse', `${base}..${head}`).split(/\r?\n/).filter(Boolean);
