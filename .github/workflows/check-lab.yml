@@ -22,7 +22,7 @@ jobs:
       - name: Fetch pull request commits
         run: git fetch --no-tags origin "pull/${{ github.event.number }}/head:refs/remotes/origin/lab-pr"
 
-      - name: Check team tasks
+      - name: Check developer tasks
         env:
           LAB_BASE_SHA: ${{ github.event.pull_request.base.sha }}
           LAB_HEAD_REF: refs/remotes/origin/lab-pr

@@ -23,7 +23,7 @@ function fileAt(commit, path) {
 }
 
 function isPlaceholder(value) {
-  return /^(?:-|n\/a|todo|your(?:[_ -].*)?|student_[12]_.+|first student|second student)$/i.test(value);
+  return /^(?:-|n\/a|todo|your(?:[_ -].*)?|student(?:[_ -].*)?)$/i.test(value);
 }
 
 function field(text, label) {
@@ -39,19 +39,19 @@ function check(label, passed, detail) {
 }
 
 check('Fork', fromFork === 'true', 'Open the PR from your own fork.');
-const pcNumber = /^team\/pc([1-9][0-9]*)$/.exec(branch ?? '')?.[1];
-check('Working branch', Boolean(pcNumber), 'Use team/pc followed by your assigned PC number, for example team/pc12.');
+const username = /^developer\/([A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?)$/.exec(branch ?? '')?.[1];
+check('Working branch', Boolean(username) && username.toLowerCase() !== 'your-github-username', 'Use developer/YOUR_GITHUB_USERNAME.');
 
 const changes = git('diff', '--name-status', base, head).split(/\r?\n/).filter(Boolean);
 const onlyFile = changes.length === 1 ? changes[0].split('\t') : [];
 const path = onlyFile[1];
-const validPath = onlyFile[0] === 'A' && Boolean(pcNumber) && path === `teams/pc${pcNumber}.md`;
-check('One new team file', validPath, 'Add only teams/pcYOUR_PC_NUMBER.md, matching your branch.');
+const validPath = onlyFile[0] === 'A' && Boolean(username) && path?.toLowerCase() === `developers/${username.toLowerCase()}.md`;
+check('One new developer file', validPath, 'Add only developers/YOUR_GITHUB_USERNAME.md, matching your branch.');
 
 if (validPath) {
   const commits = git('rev-list', '--reverse', `${base}..${head}`).split(/\r?\n/).filter(Boolean);
   const subjects = commits.map((sha) => git('log', '-1', '--format=%s', sha));
-  const expected = ['lab: create team file', 'lab: add names', 'Revert "lab: add names"', 'lab: add final details'];
+  const expected = ['lab: create developer file', 'lab: add name', 'Revert "lab: add name"', 'lab: add final details'];
   const positions = [];
   let previous = -1;
   for (const subject of expected) {
@@ -65,17 +65,18 @@ if (validPath) {
   if (ordered) {
     const [created, named, reverted, completed] = positions.map((position) => fileAt(commits[position], path));
     const final = fileAt(head, path);
-    const teamName = created?.match(/^# Team:\s*(.+)$/m)?.[1]?.trim();
-    const firstVersion = Boolean(teamName && !isPlaceholder(teamName) && created.split('\n').filter(Boolean).length === 1);
-    check('Task 1: file with team heading', firstVersion, 'Commit the heading by itself.');
-    check('Task 2: both names', Boolean(field(named, 'Student 1 name') && field(named, 'Student 2 name')), 'Add both names in the second commit.');
-    check('Task 3: revert restored first version', reverted === created, 'Revert the names commit before adding final details.');
+    const fullName = created?.match(/^# Developer:\s*(.+)$/m)?.[1]?.trim();
+    const firstVersion = Boolean(fullName && !isPlaceholder(fullName) && created.split('\n').filter(Boolean).length === 1);
+    check('Task 1: file with developer heading', firstVersion, 'Commit only the heading first.');
+    check('Task 2: name added', Boolean(field(named, 'Name') && field(named, 'Name') === fullName), 'Add your name in the second commit.');
+    check('Task 3: revert restored first version', reverted === created, 'Revert the name commit before adding final details.');
 
-    const labels = ['Student 1 name', 'Student 1 department', 'Student 1 year', 'Student 1 semester', 'Student 2 name', 'Student 2 department', 'Student 2 year', 'Student 2 semester'];
-    const finalComplete = labels.every((label) => field(completed, label) && field(final, label));
-    check('Task 4: both students’ final details', finalComplete, 'Fill all eight labelled fields.');
+    const labels = ['Name', 'Department', 'Year', 'Branch', 'Interests or hobbies'];
+    const finalComplete = labels.every((label) => field(completed, label) && field(final, label)) &&
+      field(completed, 'Name') === fullName && field(final, 'Name') === fullName;
+    check('Task 4: final developer details', finalComplete, 'Fill in name, department, year, academic branch, and interests or hobbies.');
   }
 }
 
-console.log('\nGitHub Star and each student’s participation are checked by the instructor.');
+console.log('\nGitHub Star is checked by the instructor.');
 if (results.some((passed) => !passed)) process.exitCode = 1;

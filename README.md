@@ -1,216 +1,163 @@
 # Git & GitHub Hands-on Lab
 
-A beginner-friendly exercise by the AI Club at G.H. Raisoni University, Saikheda.
+An individual online exercise by the AI Club at G.H. Raisoni University, Saikheda.
 
----
+You will create a file about yourself, save changes in commits, undo one commit, and send a pull request (PR). Use **Git Bash** for the commands. Keep the same terminal open throughout.
 
-### Instructions and setup
-* Students work in **pairs** on **one computer**.
-* Both students need a **GitHub account**.
-* Open **Git Bash** on your computer and keep the same terminal window open throughout the session.
+Your file will be **public**. Share only details you are comfortable making public; do not add a phone number, personal email, or address.
 
-## A few words before you start
+## Before you begin
 
-Both students need GitHub accounts. One student will own the pair's fork; take turns at the keyboard. Your team file will be public, including the names and academic details you enter.
+Create a [GitHub account](https://github.com/signup) and [install Git](https://git-scm.com/downloads) if you have not already. Check Git with `git --version`.
 
-**Some Key Concepts**
-* **Fork:** Copying the main project repository into your personal GitHub account.
-* **Clone:** Downloading your copy (fork) from GitHub to your local computer.
-* **Branch:** Creating a separate workspace so your main code remains safe.
-* **Commit:** Saving a checkpoint of your local changes.
-* **Push:** Uploading your local commits to your GitHub account.
-* **Pull Request (PR):** Requesting the original repository owner to merge your work.
-
----
+| Word | Meaning |
+| --- | --- |
+| Fork | Your copy of this online repository |
+| Clone | Download your fork to your computer |
+| Branch | A separate line of work |
+| Commit | A saved checkpoint |
+| Revert | A new commit that undoes an earlier commit |
+| Push | Upload your commits to GitHub |
+| Pull request (PR) | Ask to add your work to the original repository |
 
 ## 1. Star, fork, and clone
 
-1. Go to the original repository: **[KEYUR141/Git-Github-Lab](https://github.com/KEYUR141/Git-Github-Lab)**
-2. Click **Star** (top right), then click **Fork** to create a copy under Student 1's account.
-3. Open **Git Bash** and run the following commands. Replace only `your-github-username` with Student 1's username:
+1. Open [KEYUR141/Git-Github-Lab](https://github.com/KEYUR141/Git-Github-Lab). Click **Star**, then **Fork**.
+2. In Git Bash, replace `your-github-username` with your own GitHub username (not your full name):
 
 ```bash
-# Replace 'your-github-username' with Student 1's account name
 GITHUB_USERNAME="your-github-username"
-
-# Clone your fork to the local machine
 git clone "https://github.com/${GITHUB_USERNAME}/Git-Github-Lab.git"
 cd Git-Github-Lab
-```
-
-4. Configure the author of this repo's commits using Student 1's name and GitHub email:
-```bash
 git config --local user.name "Your Full Name"
 git config --local user.email "your-github-email@example.com"
+git remote -v
 ```
 
-**Check:** Run `git remote -v`. It should show Student 1's fork, not `KEYUR141`.
+Use an email connected to your GitHub account. `git remote -v` should show **your fork**, not `KEYUR141`.
 
+## 2. Create your branch
 
-## 2. Create a Working Branch
-
-Your team name goes **inside the file**. For the branch and filename, use only your computer number. Replace `12` below with the number assigned to your computer. Keep this Git Bash window open so `PC_NUMBER` remains set.
-
-Bring your local copy up to date and create a branch:
+Your username gives you a unique branch and file, so you do not need a team name or PC number. Keep the same Git Bash window open so `GITHUB_USERNAME` stays set.
 
 ```bash
-PC_NUMBER="12"
 git switch main
 git pull --ff-only origin main
-git switch -c "team/pc${PC_NUMBER}"
+git switch -c "developer/${GITHUB_USERNAME}"
 git branch --show-current
 ```
 
-**Check:** The last command should show your branch, such as `team/pc12`.
+The last command should show `developer/your-github-username` with your actual username.
 
-## Task 1 : Create and Commit Your Team File
+## Task 1: Create your file
 
-Create one file inside the existing `teams/` directory. Use your PC number for its name, such as `teams/pc12.md`.
-
-1. Open your code editor (VS Code or Notepad) and put only a single header in your team file. If your computer is PC 12, the file is `teams/pc12.md`:
+Create `developers/your-github-username.md` in a text editor. For now, put **only this heading** in it, using your actual full name:
 
 ```md
-# Team: YOUR_TEAM_NAME
+# Developer: Your Full Name
 ```
 
-1. Save the file, then stage and commit it using Git Bash:
+Save it, then run:
 
 ```bash
 git status
-git add "teams/pc${PC_NUMBER}.md"
+git add "developers/${GITHUB_USERNAME}.md"
 git diff --staged
-git commit -m "lab: create team file"
+git commit -m "lab: create developer file"
 git log --oneline -1
 ```
 
-## Task 2: Add Student Names
+`git add` stages the file; `git diff --staged` shows what the commit will save.
 
-1. Open the same team file again and add both student names below the header:
+## Task 2: Edit and commit
+
+Add a `Name:` line to the same file:
 
 ```md
-# Team: YOUR_TEAM_NAME
+# Developer: Your Full Name
 
-Student 1 name: STUDENT_1_FULL_NAME
-Student 2 name: STUDENT_2_FULL_NAME
+Name: Your Full Name
 ```
 
-1. Save the file, review your changes, and make a second commit:
+Save it, then run:
 
 ```bash
 git diff
-git add "teams/pc${PC_NUMBER}.md"
-git commit -m "lab: add names"
+git add "developers/${GITHUB_USERNAME}.md"
+git commit -m "lab: add name"
 git log --oneline -2
 ```
 
-## Task 3: Revert the Names Commit
+`git diff` shows your unstaged edits; `git log` shows your saved commits.
 
-Now you will undo the second commit without wiping out your history using git revert.
-
-Run the revert command:
+## Task 3: Revert that edit
 
 ```bash
 git revert HEAD --no-edit
-```
-**Troubleshooting** (If a text editor opens (do not panic)):
-If Git Bash opens a text editor (like Vim) displaying a message, type :wq and press Enter to save and exit.
-
-Verify the revert:
-
-```bash
 git log --oneline -3
 ```
-Open your team file in the editor. It should now show only the original `# Team: YOUR_TEAM_NAME` heading.
 
-## Task 4: Add Final Details
+Your file should contain **only the heading again**. The old commit remains in history; the revert adds a new commit that cancels its change.
 
-1. Open the same team file and add complete academic details for both team members:
+## Task 4: Add your final details
+
+Fill in the same file with your own information. Here, **Branch** means your academic branch/specialization, not the Git branch.
 
 ```md
-# Team: YOUR_TEAM_NAME
+# Developer: Your Full Name
 
-Student 1 name: STUDENT_1_FULL_NAME
-Student 1 department: STUDENT_1_DEPARTMENT
-Student 1 year: STUDENT_1_YEAR
-Student 1 semester: STUDENT_1_SEMESTER
-
-Student 2 name: STUDENT_2_FULL_NAME
-Student 2 department: STUDENT_2_DEPARTMENT
-Student 2 year: STUDENT_2_YEAR
-Student 2 semester: STUDENT_2_SEMESTER
+Name: Your Full Name
+Department: Your Department
+Year: Your Year
+Branch: Your Academic Branch
+Interests or hobbies: Your Interests or Hobbies
 ```
 
-1. Save the file, stage, and commit:
+Save it, then run:
 
 ```bash
 git diff
-git add "teams/pc${PC_NUMBER}.md"
+git add "developers/${GITHUB_USERNAME}.md"
 git commit -m "lab: add final details"
-```
-1. Confirm your 4 commits:
-
-```bash
 git log --oneline -4
 ```
 
-You should see exactly four commit messages: create file, add names, revert commit, and add final details.
+You should see four lab commits: create, add name, revert, and final details.
 
-## Task 5 : Push Changes and open a pull request
-
-1. Push your local branch up to your GitHub fork:
+## Task 5: Push and open a PR
 
 ```bash
-git push -u origin "team/pc${PC_NUMBER}"
+git push -u origin "developer/${GITHUB_USERNAME}"
 ```
 
-1. Go to your fork's page on GitHub in your web browser.
+Open your fork on GitHub. Click **Contribute → Open pull request** (or **Compare & pull request**). Check that the **base** is `KEYUR141/Git-Github-Lab:main` and the **head** is your fork's `developer/your-github-username` branch. Title it `Add developer profile: your-github-username`, then create the PR. The automatic check will report whether the tasks are complete.
 
-2. Click Contribute → Open pull request (or the green Compare & pull request button).
-
-3. Verify the PR settings:
-
-    i. Base repository: KEYUR141/Git-Github-Lab | Branch: main
-
-    ii. Head repository: your-username/Git-Github-Lab | Branch: `team/pc12` for PC 12
-
-4. Set the PR Title: Add YOUR_TEAM_NAME (PC YOUR_PC_NUMBER)
-
-5. Click Create Pull Request.
-
-## Optional: Sync Upstream Changes (If you were fast )
-
-If other teams' PRs get merged into the main repository while you are working, sync your fork with the original repository:
+If another PR was merged while you worked, you can sync the original repository before pushing again:
 
 ```bash
-# Add the original repo as an upstream remote
 git remote add upstream https://github.com/KEYUR141/Git-Github-Lab.git
-
-# Fetch upstream commits and merge them
 git fetch upstream
 git merge upstream/main
+git push
 ```
+
 ## Command reminder
 
-| Command | What you used it for |
+| Command | What it does |
 | --- | --- |
-| `git --version` | Check that Git is available |
-| `git clone` | Download your fork to the lab computer |
-| `git config --local` | Set the identity recorded on commits in this repository |
-| `git remote -v` | See where fetches and pushes go |
-| `git switch main` | Return to the main branch |
-| `git pull --ff-only` | Bring your local main branch up to date |
-| `git switch -c` | Create and enter your working branch |
-| `git branch --show-current` | Confirm the branch you are using |
-| `git status` | Check changed, staged, or untracked files |
-| `git diff` / `git diff --staged` | Review changes before and after staging |
-| `git add` | Stage a file for the next commit |
-| `git commit` | Save a project version |
-| `git log --oneline` | Read the commit history |
-| `git revert` | Undo a committed change with a new commit |
-| `git push` | Send your branch to your fork on GitHub |
+| `git --version` | Check Git is installed |
+| `git clone` | Download your fork |
+| `git config --local` | Set the name and email recorded on your commits |
+| `git remote -v` | Show connected online repositories |
+| `git switch` | Change or create a branch |
+| `git pull --ff-only` | Update your local `main` |
+| `git branch --show-current` | Show your current branch |
+| `git status` | Show changed and staged files |
+| `git diff` / `git diff --staged` | Preview edits before and after staging |
+| `git add` | Stage a file |
+| `git commit` | Save a checkpoint |
+| `git log --oneline` | View commit history |
+| `git revert` | Undo a commit without deleting history |
+| `git push` | Upload your branch |
 
-The optional upstream section uses `git fetch` to download changes and `git merge` to bring them into your branch. They are not required for the five lab tasks.
-
-`git init` starts a brand-new local repository. This exercise uses `git clone` because the shared practice repository already exists.
-
-
+`git init` creates a brand-new repository. Here you use `git clone` because the lab repository already exists.

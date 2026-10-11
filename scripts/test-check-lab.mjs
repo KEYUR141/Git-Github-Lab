@@ -7,16 +7,17 @@ import { fileURLToPath } from 'node:url';
 
 const checker = join(dirname(fileURLToPath(import.meta.url)), 'check-lab.mjs');
 const directory = mkdtempSync(join(tmpdir(), 'git-lab-check-'));
+const profile = join(directory, 'developers', 'asha-dev.md');
 
 function git(...args) {
   return execFileSync('git', args, { cwd: directory, encoding: 'utf8' }).trim();
 }
 
-function writeTeam(text) {
-  writeFileSync(join(directory, 'teams', 'byte-builders-pc12.md'), text);
+function writeProfile(text) {
+  writeFileSync(profile, text);
 }
 
-function runCheck(base, branch = 'team/byte-builders-pc12') {
+function runCheck(base, branch = 'developer/asha-dev') {
   return spawnSync(process.execPath, [checker], {
     cwd: directory,
     encoding: 'utf8',
@@ -34,39 +35,39 @@ try {
   git('init', '-b', 'main');
   git('config', 'user.name', 'Lab Tester');
   git('config', 'user.email', 'lab@example.com');
-  mkdirSync(join(directory, 'teams'));
+  mkdirSync(join(directory, 'developers'));
   writeFileSync(join(directory, 'README.md'), '# Lab\n');
   git('add', 'README.md');
   git('commit', '-m', 'Initial commit');
   const base = git('rev-parse', 'HEAD');
 
-  git('switch', '-c', 'team/byte-builders-pc12');
-  writeTeam('# Team: Byte Builders\n');
-  git('add', 'teams/byte-builders-pc12.md');
-  git('commit', '-m', 'lab: create team file');
+  git('switch', '-c', 'developer/asha-dev');
+  writeProfile('# Developer: Asha Rao\n');
+  git('add', 'developers/asha-dev.md');
+  git('commit', '-m', 'lab: create developer file');
 
-  writeTeam('# Team: Byte Builders\n\nStudent 1 name: Asha Rao\nStudent 2 name: Ravi Shah\n');
-  git('add', 'teams/byte-builders-pc12.md');
-  git('commit', '-m', 'lab: add names');
+  writeProfile('# Developer: Asha Rao\n\nName: Asha Rao\n');
+  git('add', 'developers/asha-dev.md');
+  git('commit', '-m', 'lab: add name');
   git('revert', 'HEAD', '--no-edit');
 
-  writeTeam('# Team: Byte Builders\n\nStudent 1 name: Asha Rao\nStudent 1 department: CSE\nStudent 1 year: 2\nStudent 1 semester: 3\n\nStudent 2 name: Ravi Shah\nStudent 2 department: CSE\nStudent 2 year: 2\nStudent 2 semester: 3\n');
-  git('add', 'teams/byte-builders-pc12.md');
+  writeProfile('# Developer: Asha Rao\n\nName: Asha Rao\nDepartment: Computer Science\nYear: 2\nBranch: AI and Data Science\nInterests or hobbies: Robotics and chess\n');
+  git('add', 'developers/asha-dev.md');
   git('commit', '-m', 'lab: add final details');
 
   const passing = runCheck(base);
   assert.equal(passing.status, 0, passing.stdout + passing.stderr);
 
-  const unchangedPlaceholder = runCheck(base, 'team/your-team-name-pc-number');
-  assert.notEqual(unchangedPlaceholder.status, 0, unchangedPlaceholder.stdout + unchangedPlaceholder.stderr);
+  const wrongBranch = runCheck(base, 'developer/someone-else');
+  assert.notEqual(wrongBranch.status, 0, wrongBranch.stdout + wrongBranch.stderr);
 
-  writeTeam('# Team: Byte Builders\n\nStudent 1 name: Asha Rao\n');
-  git('add', 'teams/byte-builders-pc12.md');
+  writeProfile('# Developer: Asha Rao\n\nName: Asha Rao\n');
+  git('add', 'developers/asha-dev.md');
   git('commit', '-m', 'Remove required details');
-  const failing = runCheck(base);
-  assert.notEqual(failing.status, 0, failing.stdout + failing.stderr);
+  const incomplete = runCheck(base);
+  assert.notEqual(incomplete.status, 0, incomplete.stdout + incomplete.stderr);
 
-  console.log('Checker smoke test passed: complete PR accepted, incomplete PR rejected.');
+  console.log('Checker smoke test passed: complete individual PR accepted, wrong branch and incomplete PR rejected.');
 } finally {
   rmSync(directory, { recursive: true, force: true });
 }
